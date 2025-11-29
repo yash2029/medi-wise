@@ -45,18 +45,6 @@ MediWise is an intelligent medical assistant that integrates with ERPNext Health
 
 ## 💡 Why Frappe + HTML? The Power of Simplicity
 
-### The Problem with Traditional Approaches
-
-Building web applications with complex backend logic typically requires:
-- **Separate frontend frameworks** (React, Vue, Angular)
-- **Separate backend APIs** (Node.js, Django, FastAPI)
-- **Complex deployment pipelines** (Docker, Kubernetes, CI/CD)
-- **Multiple repositories** and tech stacks to maintain
-- **CORS configuration** and authentication headaches
-- **Significant development overhead** for simple use cases
-
-### The Frappe + HTML Solution
-
 MediWise demonstrates that **you don't need a complex frontend framework** to build sophisticated web applications. By leveraging Frappe's native capabilities with plain HTML/CSS/JavaScript, you get:
 
 #### ✅ **Zero Build Process**
@@ -133,10 +121,12 @@ MediWise proves this architecture works for **production applications**:
 Frappe's Server Script + Web Page combination lets you build sophisticated applications while:
 - Reducing complexity by 10x
 - Eliminating frontend build tooling
-- Leveraging existing ERPNext infrastructure
-- Deploying in minutes, not hours
 
-This approach is ideal for teams already using ERPNext who need custom interfaces without the overhead of modern frontend frameworks.
+---
+
+## ☁️AWS Instance
+<img width="2928" height="1508" alt="image" src="https://github.com/user-attachments/assets/f07b0ea9-76f4-4e5d-8e8e-a63a9b52d3fe" />
+
 
 ---
 
@@ -173,11 +163,6 @@ The HTML interface can be deployed in Frappe/ERPNext in several ways:
 1. Create a custom Frappe app
 2. Add the HTML file to `{app}/www/mediwise.html`
 3. The page will be available at `/mediwise`
-
-#### Option 3: Portal Page
-
-1. Add as a portal page in your custom app
-2. Configure in `hooks.py` under `website_route_rules`
 
 ### Technologies Used
 
