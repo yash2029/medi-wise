@@ -39,7 +39,7 @@ NOTE: frappe and json are pre-loaded in Server Scripts, no imports needed
 
 # ⚠️ REPLACE WITH YOUR ACTUAL N8N WEBHOOK URL
 # Get from your n8n workflow webhook node
-N8N_WEBHOOK_URL = "https://surgemind.app.n8n.cloud/webhook/82106378-43fd-4766-9117-0465104fcc67"
+N8N_WEBHOOK_URL = "our_n8n_weebhook"
 
 
 # =============================================================================
