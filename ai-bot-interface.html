@@ -1,0 +1,2918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediWise AI Assistant - Patient Diagnosis</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    
+    <!-- Lottie Animation Library -->
+    <script
+      src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.5/dist/dotlottie-wc.js"
+      type="module"
+    ></script>
+    
+    <style>
+        /* =================================================================
+           CSS VARIABLES - Medical Professional Theme
+           ================================================================= */
+        :root {
+            /* Colors - Medical Professional */
+            --primary-bg: #F8F9FA;
+            --secondary-bg: #FFFFFF;
+            --tertiary-bg: #F5F7FA;
+            
+            --accent-primary: #2E86DE;
+            --accent-primary-hover: #1E5FA8;
+            --accent-secondary: #26C281;
+            --accent-warning: #F39C12;
+            --accent-error: #E74C3C;
+            --accent-info: #3498DB;
+            
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --text-tertiary: #95A5A6;
+            --text-inverse: #FFFFFF;
+            
+            --border-subtle: #E8ECF1;
+            --border-medium: #D0D7DE;
+            
+            --shadow-soft: rgba(0, 0, 0, 0.06);
+            --shadow-medium: rgba(0, 0, 0, 0.1);
+            --shadow-strong: rgba(0, 0, 0, 0.15);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+        }
+        
+        /* =================================================================
+           GLOBAL STYLES
+           ================================================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* =================================================================
+           MAIN LAYOUT - TWO PANEL DESIGN
+           ================================================================= */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        
+        /* Left Panel - Patient Information */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--secondary-bg);
+            border-right: 2px solid var(--border-subtle);
+            overflow: hidden;
+            min-width: 0;
+        }
+        
+        /* Right Panel - AI Assistant (FIXED WIDTH) */
+        .right-panel {
+            width: 650px;
+            min-width: 650px;
+            max-width: 650px;
+            flex-shrink: 0;
+            flex-grow: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--tertiary-bg);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* =================================================================
+           HEADER
+           ================================================================= */
+        .app-header {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-info));
+            color: white;
+            padding: var(--space-lg) var(--space-xl);
+            height: 96px;
+            min-height: 96px;
+            max-height: 96px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px var(--shadow-medium);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-title h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .header-title p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .header-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-md);
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* =================================================================
+           PATIENT LIST SECTION
+           ================================================================= */
+        .patient-list-section {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--tertiary-bg);
+            max-height: 50vh;
+        }
+        
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg) var(--space-xl);
+            padding-bottom: var(--space-md);
+        }
+        
+        .list-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .list-header-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .subtle-action-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) var(--space-sm);
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all var(--transition-fast);
+            font-family: var(--font-primary);
+        }
+        
+        .subtle-action-btn:hover {
+            background: var(--tertiary-bg);
+            border-color: var(--border-medium);
+            color: var(--text-primary);
+        }
+        
+        .subtle-btn-icon {
+            font-size: 0.9rem;
+        }
+        
+        .subtle-btn-text {
+            font-weight: 500;
+        }
+        
+        /* =================================================================
+           PATIENT LIST SECTION
+           ================================================================= */
+        .patient-list-section {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--tertiary-bg);
+            max-height: 50vh;
+        }
+        
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg) var(--space-xl);
+            padding-bottom: var(--space-md);
+        }
+        
+        .list-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .list-header-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .subtle-action-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) var(--space-sm);
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all var(--transition-fast);
+            font-family: var(--font-primary);
+        }
+        
+        .subtle-action-btn:hover {
+            background: var(--tertiary-bg);
+            border-color: var(--border-medium);
+            color: var(--text-primary);
+        }
+        
+        .subtle-btn-icon {
+            font-size: 0.9rem;
+        }
+        
+        .subtle-btn-text {
+            font-weight: 500;
+        }
+        
+        .selector-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .patient-count {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            background: var(--secondary-bg);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+        }
+        
+        .patient-search {
+            margin: 0 var(--space-xl) var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+            transition: all var(--transition-fast);
+            background: var(--secondary-bg);
+        }
+        
+        .patient-search:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(46, 134, 222, 0.1);
+        }
+        
+        .patient-list {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--secondary-bg);
+        }
+        
+        .list-loading {
+            padding: var(--space-xl);
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+        
+        .patient-list-item {
+            padding: var(--space-md) var(--space-xl);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .patient-list-item:hover {
+            background: var(--tertiary-bg);
+        }
+        
+        .patient-list-item.selected {
+            background: linear-gradient(90deg, rgba(46, 134, 222, 0.1), rgba(38, 194, 129, 0.1));
+            border-left: 4px solid var(--accent-primary);
+        }
+        
+        .patient-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-info));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .patient-list-item.selected .patient-avatar {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+            box-shadow: 0 2px 8px rgba(46, 134, 222, 0.3);
+        }
+        
+        .patient-list-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .patient-list-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+            font-size: 0.95rem;
+        }
+        
+        .patient-list-details {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .patient-list-details span {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .no-patients {
+            padding: var(--space-2xl);
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+        
+        /* =================================================================
+           PATIENT INFORMATION DISPLAY
+           ================================================================= */
+        .patient-info-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-xl);
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-tertiary);
+            text-align: center;
+            padding: var(--space-2xl);
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+        
+        .info-section {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            box-shadow: 0 2px 4px var(--shadow-soft);
+        }
+        
+        .info-section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 2px solid var(--border-subtle);
+        }
+        
+        .info-section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-info));
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        
+        .info-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .info-list {
+            list-style: none;
+        }
+        
+        .info-list-item {
+            padding: var(--space-md);
+            background: var(--tertiary-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .info-list-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .alert-item {
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .alert-item.warning {
+            background: rgba(243, 156, 18, 0.1);
+            border-left: 4px solid var(--accent-warning);
+        }
+        
+        .alert-item.error {
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid var(--accent-error);
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+        
+        /* =================================================================
+           AI ASSISTANT PANEL (RIGHT SIDE - FIXED WIDTH)
+           ================================================================= */
+        .ai-panel-header {
+            padding: var(--space-lg) var(--space-xl);
+            height: 96px;
+            min-height: 96px;
+            max-height: 96px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-info));
+            color: white;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px var(--shadow-medium);
+        }
+        
+        .ai-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: var(--space-md);
+        }
+        
+        .ai-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            flex: 1;
+        }
+        
+        .ai-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .ai-header-text h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.2rem;
+        }
+        
+        .ai-header-text p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--accent-primary);
+            border: 1px solid rgba(255, 255, 255, 1);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-badge.thinking {
+            background: rgba(243, 156, 18, 0.95);
+            color: white;
+            border-color: rgba(243, 156, 18, 1);
+        }
+        
+        .status-badge.ready {
+            background: rgba(38, 194, 129, 0.95);
+            color: white;
+            border-color: rgba(38, 194, 129, 1);
+        }
+        
+        .status-badge.error {
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            border-color: rgba(231, 76, 60, 1);
+        }
+        
+        /* Loading Overlay - Only covers chat area, not header or input */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            /* Prevent inheriting any filters or transforms from parent */
+            filter: none;
+            transform: none;
+        }
+        
+        /* Match test file exactly - simple and clean, with protection from parent blur */
+        .loading-overlay dotlottie-wc {
+            display: block;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            /* Override any inherited filters - critical for sharpness */
+            filter: none !important;
+            -webkit-filter: none !important;
+            /* GPU acceleration - match test file */
+            transform: translateZ(0);
+            will-change: transform;
+            /* Image rendering hints - match test file */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Chat Area - FIXED WIDTH MAINTAINED */
+        .ai-chat-area {
+            position: relative;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            padding: var(--space-xl);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        #messagesContainer {
+            padding: var(--space-md) var(--space-xl);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .welcome-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .welcome-message h3 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .welcome-message p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .quick-action-btn {
+            padding: var(--space-md);
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: left;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .quick-action-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            transform: translateX(4px);
+        }
+        
+        .quick-action-icon {
+            font-size: 1.3rem;
+        }
+        
+        /* Messages - WIDTH CONTROLLED */
+        .message {
+            margin-bottom: var(--space-lg);
+            display: flex;
+            gap: var(--space-md);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .message-avatar.bot {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+        }
+        
+        .message-avatar.user {
+            background: var(--accent-info);
+        }
+        
+        .message-content {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .message-header strong {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .message-header span {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+        }
+        
+        .message-bubble {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md) var(--space-lg);
+            word-wrap: break-word;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .message.user .message-bubble {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+        
+        .message-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: var(--space-xs);
+            padding: var(--space-md);
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        /* Input Area - WIDTH CONTROLLED */
+        .ai-input-area {
+            padding: var(--space-xl);
+            background: var(--secondary-bg);
+            border-top: 1px solid var(--border-subtle);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: var(--space-md);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .query-input {
+            width: 100%;
+            max-width: 100%;
+            height: 48px;
+            padding: 0.6875rem 1rem;
+            border: 2px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            font-family: var(--font-primary);
+            font-size: 0.95rem;
+            resize: none;
+            transition: all var(--transition-fast);
+            max-height: 120px;
+            box-sizing: border-box;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+        
+        .query-input::placeholder {
+            line-height: 1.5;
+        }
+        
+        .query-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
+        }
+        
+        .send-button {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            border: none;
+            background: var(--accent-primary);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .send-button:hover {
+            background: var(--accent-primary-hover);
+            transform: scale(1.05);
+        }
+        
+        .send-button:disabled {
+            background: var(--border-medium);
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        
+        /* File Upload Styles */
+        .file-upload-button {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-medium);
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        
+        .file-upload-button:hover {
+            background: var(--tertiary-bg);
+            border-color: var(--accent-primary);
+        }
+        
+        .file-preview {
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+        }
+        
+        .file-preview-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
+        }
+        
+        .file-preview-item span {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .file-remove-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: var(--accent-error);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        
+        .file-remove-btn:hover {
+            background: var(--accent-error);
+            opacity: 0.8;
+        }
+        
+        /* Markdown Styles */
+        .message-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .message-text h1,
+        .message-text h2,
+        .message-text h3 {
+            margin-top: var(--space-md);
+            margin-bottom: var(--space-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .message-text h1 {
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--border-subtle);
+            padding-bottom: var(--space-xs);
+        }
+        
+        .message-text h2 {
+            font-size: 1.3rem;
+        }
+        
+        .message-text h3 {
+            font-size: 1.1rem;
+        }
+        
+        .message-text p {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .message-text ul,
+        .message-text ol {
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .message-text li {
+            margin-bottom: var(--space-xs);
+        }
+        
+        .message-text code {
+            background: var(--tertiary-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+        
+        .message-text pre {
+            background: var(--tertiary-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            margin: var(--space-sm) 0;
+        }
+        
+        .message-text pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        .message-text strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .message-text em {
+            font-style: italic;
+        }
+        
+        .message-text blockquote {
+            border-left: 4px solid var(--accent-primary);
+            padding-left: var(--space-md);
+            margin: var(--space-sm) 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .message-text table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-sm) 0;
+        }
+        
+        .message-text table th,
+        .message-text table td {
+            padding: var(--space-sm);
+            border: 1px solid var(--border-subtle);
+            text-align: left;
+        }
+        
+        .message-text table th {
+            background: var(--tertiary-bg);
+            font-weight: 600;
+        }
+        
+        /* =================================================================
+           DATA DISPLAY COMPONENTS
+           ================================================================= */
+        .data-display {
+            margin-top: var(--space-md);
+            background: var(--tertiary-bg);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+        }
+        
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+        
+        .data-header h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .data-actions button {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            background: var(--secondary-bg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .data-actions button:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+        
+        .json-view {
+            background: var(--text-primary);
+            color: var(--accent-secondary);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+        
+        /* =================================================================
+           UTILITY CLASSES
+           ================================================================= */
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge.success {
+            background: rgba(38, 194, 129, 0.1);
+            color: var(--accent-secondary);
+        }
+        
+        .badge.warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--accent-warning);
+        }
+        
+        .badge.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--accent-error);
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: var(--space-xl);
+            right: var(--space-xl);
+            background: var(--text-primary);
+            color: white;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 16px var(--shadow-strong);
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+            z-index: 10000;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .toast.success {
+            background: var(--accent-secondary);
+        }
+        
+        .toast.error {
+            background: var(--accent-error);
+        }
+        
+        .toast.warning {
+            background: var(--accent-warning);
+        }
+        
+        /* Scrollbar Styling - Overlay to prevent layout shift */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-medium) transparent;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1280px) {
+            .right-panel {
+                width: 500px;
+                min-width: 500px;
+                max-width: 500px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                min-width: unset;
+                max-height: 50vh;
+            }
+            
+            .right-panel {
+                width: 100%;
+                min-width: unset;
+                max-width: unset;
+                flex-shrink: 1;
+                flex-grow: 1;
+                flex: 1;
+            }
+            
+            .welcome-message {
+                padding: var(--space-md);
+            }
+            
+            #messagesContainer {
+                padding: var(--space-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- LEFT PANEL: Patient Information -->
+        <div class="left-panel">
+            <!-- Patient List Section -->
+            <div class="patient-list-section">
+                <div class="list-header">
+                    <div class="list-header-left">
+                        <label class="selector-label">Patients</label>
+                        <div class="patient-count" id="patientCount">Loading...</div>
+                    </div>
+                    <div class="list-header-actions">
+                        <button class="subtle-action-btn" onclick="refreshPatientList()" title="Refresh patient list">
+                            <span class="subtle-btn-icon">🔄</span>
+                            <span class="subtle-btn-text">Refresh</span>
+                        </button>
+                        <button class="subtle-action-btn" onclick="exportPatientData()" title="Export patient data">
+                            <span class="subtle-btn-icon">💾</span>
+                            <span class="subtle-btn-text">Export</span>
+                        </button>
+                    </div>
+                </div>
+                <input 
+                    type="text" 
+                    class="patient-search" 
+                    id="patientSearch"
+                    placeholder="🔍 Search by name or ID..."
+                    autocomplete="off"
+                />
+                <div class="patient-list" id="patientList">
+                    <!-- Patient list items will be populated here -->
+                    <div class="list-loading">Loading patients...</div>
+                </div>
+            </div>
+            
+            <!-- Patient Information Display -->
+            <div class="patient-info-container" id="patientInfoContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">👤</div>
+                    <h3>No Patient Selected</h3>
+                    <p>Please select a patient from the search above to view their information and start diagnosis assistance.</p>
+                        </div>
+                        </div>
+                        </div>
+        
+        <!-- RIGHT PANEL: AI Assistant (FIXED WIDTH) -->
+        <div class="right-panel">
+            <!-- AI Panel Header -->
+            <div class="ai-panel-header">
+                <div class="ai-header-content">
+                    <div class="ai-header-left">
+                        <div class="ai-icon">🩺</div>
+                        <div class="ai-header-text">
+                            <h2>Mediwise</h2>
+                            <p>Mediwise AI Assistant</p>
+                        </div>
+                    </div>
+                    <div class="ai-status" id="aiStatus">
+                        <span class="status-badge" id="statusBadge">Ready</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Area -->
+            <div class="ai-chat-area" id="aiChatArea">
+                <div class="welcome-message" id="welcomeMessage">
+                    <div class="welcome-icon">🩺</div>
+                    <h3>Welcome, Doctor</h3>
+                    <p>Select a patient to begin diagnosis assistance. I'll analyze their medical history, current medications, and symptoms to help you make informed decisions.</p>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" onclick="quickAction('analyze')">
+                            <span class="quick-action-icon">📊</span>
+                            <span>Analyze patient history</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="quickAction('medications')">
+                            <span class="quick-action-icon">💊</span>
+                            <span>Review active medications</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="quickAction('labs')">
+                            <span class="quick-action-icon">🧪</span>
+                            <span>Check lab results</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="quickAction('risk')">
+                            <span class="quick-action-icon">⚠️</span>
+                            <span>Assess risk factors</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Messages Container -->
+                <div id="messagesContainer"></div>
+                
+                <!-- Loading Overlay - Only covers chat area -->
+                <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                    <dotlottie-wc
+                      src="https://lottie.host/e27c12e0-19e9-49c9-a8aa-ded0a1d507d9/PueYLbVzJ4.lottie"
+                      style="width: 300px; height: 300px;"
+                      autoplay
+                      loop
+                    ></dotlottie-wc>
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="ai-input-area">
+                <!-- File Preview Area -->
+                <div id="filePreview" class="file-preview" style="display: none;">
+                    <div class="file-preview-item">
+                        <span id="fileName"></span>
+                        <button class="file-remove-btn" onclick="removeFile()">×</button>
+                    </div>
+                </div>
+                <div class="input-container">
+                    <button class="file-upload-button" id="fileUploadButton" onclick="document.getElementById('fileInput').click()" title="Upload image or document">
+                        📎
+                    </button>
+                    <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.txt" style="display: none;" onchange="handleFileSelect(event)">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="queryInput" 
+                            class="query-input" 
+                            placeholder="Ask me anything or upload an image/document..."
+                            rows="1"
+                        ></textarea>
+                    </div>
+                    <button class="send-button" id="sendButton" onclick="sendQuery()">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // =================================================================
+        // CONFIGURATION
+        // =================================================================
+        const CONFIG = {
+            FRAPPE_BASE_URL: window.location.origin,
+            API_METHOD: '/api/method/mediwise_bot.query',
+            
+            // ⚠️⚠️⚠️ IMPORTANT: REPLACE WITH YOUR ACTUAL API CREDENTIALS ⚠️⚠️⚠️
+            // 
+            // How to generate:
+            // 1. bench --site your-site.local console
+            // 2. user = frappe.get_doc("User", "your@email.com")
+            // 3. api_key, api_secret = user.generate_keys()
+            // 4. Copy the keys below
+            //
+            // 🔒 CSRF Token Issue Fix:
+            // If you get CSRFTokenError, add this to your Server Script at the very top:
+            // frappe.flags.ignore_csrf = True
+            //
+            // For production: Consider using user session tokens instead of hardcoded keys
+            API_KEY: '6e5751c8599f6c2',
+            API_SECRET: 'be60e99f0b851de'
+        };
+        
+        // =================================================================
+        // STATE MANAGEMENT
+        // =================================================================
+        const STATE = {
+            selectedPatient: null,
+            patientData: null,
+            messages: [],
+            isProcessing: false,
+            patientList: [],
+            selectedFile: null,
+            selectedFileData: null,
+            sessionId: null  // RAG session ID - generated when patient is selected
+        };
+        
+        // =================================================================
+        // INITIALIZATION
+        // =================================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchCSRFToken();
+            setupEventListeners();
+            await loadPatientList();
+            // Initialize status to show ready GIF
+            updateAIStatus('ready');
+        });
+        
+        function setupEventListeners() {
+            // Patient search - filter list in real-time
+            const patientSearch = document.getElementById('patientSearch');
+            patientSearch.addEventListener('input', filterPatientList);
+            
+            // Query input
+            const queryInput = document.getElementById('queryInput');
+            queryInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendQuery();
+                }
+            });
+            
+            // Auto-resize textarea (allow growth up to max-height, but start at 48px)
+            queryInput.addEventListener('input', () => {
+                queryInput.style.height = '48px';
+                if (queryInput.scrollHeight > 48) {
+                    queryInput.style.height = Math.min(queryInput.scrollHeight, 120) + 'px';
+                }
+            });
+        }
+        
+        // =================================================================
+        // PATIENT MANAGEMENT
+        // =================================================================
+        async function loadPatientList(searchTerm = '') {
+            try {
+                // Show loading in list
+                document.getElementById('patientList').innerHTML = '<div class="list-loading">🔄 Loading patients...</div>';
+                document.getElementById('patientCount').textContent = 'Loading...';
+                
+                // Fetch real patients from ERPNext API
+                // Set limit to a high number to load all patients (adjust based on your patient count)
+                STATE.patientList = await fetchPatients(searchTerm, 5000); // Load all patients
+                
+                // Update count
+                document.getElementById('patientCount').textContent = `${STATE.patientList.length} patients`;
+                
+                // Render patient list
+                renderPatientList(STATE.patientList);
+                
+                if (STATE.patientList.length === 0 && !searchTerm) {
+                    showToast('No patients found in the system', 'warning');
+                }
+            } catch (error) {
+                showToast(`Failed to load patient list: ${error.message}`, 'error');
+                
+                // Show error in list
+                document.getElementById('patientList').innerHTML = `
+                    <div class="no-patients" style="color: var(--accent-error);">
+                        <strong>⚠️ Failed to load patients</strong><br>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
+                            ${error.message}
+                        </small>
+                    </div>
+                `;
+                document.getElementById('patientCount').textContent = 'Error';
+            }
+        }
+        
+        async function fetchPatients(searchTerm = '', limit = 100) {
+            try {
+                
+                const response = await frappeAPI({
+                    query_type: 'search_patients',
+                    parameters: {
+                        search_term: searchTerm,
+                        limit: limit
+                    }
+                });
+                
+                
+                // Handle different possible response structures
+                let patients = [];
+                
+                // Check if response indicates an error or unexpected structure
+                if (response && response.ignore_csrf) {
+                    throw new Error('Server script configuration issue. Check that the server script is properly deployed and the API method name is correct.');
+                }
+                
+                if (response && response.status === 'error') {
+                    throw new Error(response.message || 'API returned error status');
+                }
+                
+                // Try different response structures
+                if (response && response.data) {
+                    
+                    if (response.data.results && Array.isArray(response.data.results)) {
+                        patients = response.data.results;
+                    } else if (Array.isArray(response.data)) {
+                        patients = response.data;
+                    } else if (response.data.count !== undefined) {
+                        // Has count but no results - empty search
+                        patients = [];
+                    } else {
+                    }
+                } else if (response && response.results && Array.isArray(response.results)) {
+                    patients = response.results;
+                } else if (Array.isArray(response)) {
+                    patients = response;
+                } else {
+                    
+                    throw new Error(
+                        'Unexpected API response structure. ' +
+                        'Check console for details. ' +
+                        'Ensure server script is properly deployed at API method "mediwise_bot.query"'
+                    );
+                }
+                
+                
+                if (patients.length > 0) {
+                }
+                
+                // Validate patient data structure
+                const validPatients = patients.filter(p => {
+                    const isValid = p && (p.name || p.patient_name);
+                    if (!isValid) {
+                    }
+                    return isValid;
+                });
+                
+                if (validPatients.length !== patients.length) {
+                }
+                
+                return validPatients;
+            } catch (error) {
+                throw error;
+            }
+        }
+        
+        // Filter patient list in real-time (local filtering)
+        function filterPatientList() {
+            const searchTerm = document.getElementById('patientSearch').value.toLowerCase().trim();
+            const patientListEl = document.getElementById('patientList');
+            
+            if (!STATE.patientList || STATE.patientList.length === 0) {
+                return;
+            }
+            
+            // Filter patients
+            const filtered = searchTerm === '' ? STATE.patientList : STATE.patientList.filter(patient => 
+                (patient.patient_name && patient.patient_name.toLowerCase().includes(searchTerm)) ||
+                (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
+                (patient.mobile && patient.mobile.includes(searchTerm))
+            );
+            
+            // Update count
+            document.getElementById('patientCount').textContent = `${filtered.length} patients`;
+            
+            // Render filtered list
+            renderPatientList(filtered);
+        }
+        
+        function renderPatientList(patients) {
+            const listEl = document.getElementById('patientList');
+            
+            if (!patients || patients.length === 0) {
+                listEl.innerHTML = '<div class="no-patients">No patients found</div>';
+                return;
+            }
+            
+            listEl.innerHTML = patients.map(patient => {
+                const patientId = patient.name || 'Unknown';
+                const patientName = patient.patient_name || 'Unknown Patient';
+                const gender = patient.gender || patient.sex || 'N/A';
+                const mobile = patient.mobile || 'No contact';
+                const bloodGroup = patient.blood_group || '';
+                const initials = patientName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const isSelected = STATE.selectedPatient === patientId ? 'selected' : '';
+                
+                return `
+                    <div class="patient-list-item ${isSelected}" onclick="selectPatient('${patientId}')">
+                        <div class="patient-avatar">${initials}</div>
+                        <div class="patient-list-info">
+                            <div class="patient-list-name">${patientName}</div>
+                            <div class="patient-list-details">
+                                <span>ID: ${patientId}</span>
+                                <span>•</span>
+                                <span>${gender}</span>
+                                ${bloodGroup ? `<span>•</span><span>${bloodGroup}</span>` : ''}
+                                ${mobile && mobile !== 'No contact' ? `<span>•</span><span>${mobile}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        async function selectPatient(patientId) {
+            // Toggle selection if clicking same patient
+            if (STATE.selectedPatient === patientId) {
+                deselectPatient();
+                return;
+            }
+            
+            document.getElementById('patientInfoContainer').classList.add('loading');
+            
+            try {
+                // Fetch comprehensive patient data
+                const response = await frappeAPI({
+                    query_type: 'get_patient_summary',
+                    parameters: {
+                        patient_id: patientId,
+                        include_recent_encounters: true,
+                        include_upcoming_appointments: true,
+                        include_pending_labs: true
+                    }
+                });
+                
+                
+                // Handle response structure - the data might be at different levels
+                let patientData = response.data || response;
+                
+                // Validate we have the required patient data
+                if (!patientData || !patientData.patient) {
+                    throw new Error('Invalid patient data structure received from API');
+                }
+                
+                STATE.selectedPatient = patientId;
+                STATE.patientData = patientData;
+                
+                // Generate new session ID with timestamp for this patient session
+                STATE.sessionId = `patient_${patientId}_${Date.now()}`;
+                
+                // Update patient list to show selection
+                renderPatientList(STATE.patientList);
+                
+                // Update patient info display
+                renderPatientInfo();
+                
+                // Update AI chat - load initial AI analysis
+                clearAIChat();
+                await loadInitialAIContext();
+                
+                showToast(`Patient ${patientId} loaded successfully`, 'success');
+            } catch (error) {
+                
+                // Reset state on error
+                STATE.selectedPatient = null;
+                STATE.patientData = null;
+                STATE.sessionId = null;  // Clear session ID on error
+                
+                showToast(`Failed to load patient data: ${error.message}`, 'error');
+                
+                // Show error in UI
+                document.getElementById('patientInfoContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>Error Loading Patient</h3>
+                        <p>${error.message}</p>
+                        <p style="font-size: 0.85rem; color: var(--text-tertiary); margin-top: 1rem;">
+                            Please check the console for more details or try selecting another patient.
+                        </p>
+                    </div>
+                `;
+                
+                // Re-render list to clear selection highlight
+                renderPatientList(STATE.patientList);
+            } finally {
+                document.getElementById('patientInfoContainer').classList.remove('loading');
+            }
+        }
+        
+        function deselectPatient() {
+            STATE.selectedPatient = null;
+            STATE.patientData = null;
+            STATE.sessionId = null;  // Clear session ID when patient is deselected
+            
+            // Update patient list to clear selection
+            renderPatientList(STATE.patientList);
+            
+            // Clear patient info display
+            document.getElementById('patientInfoContainer').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👤</div>
+                    <h3>No Patient Selected</h3>
+                    <p>Click on a patient from the list above to view their information.</p>
+                </div>
+            `;
+            
+            // Clear AI chat and reset status
+            clearAIChat();
+            updateAIStatus('ready', 'Ready');
+            
+            showToast('Patient deselected', 'info');
+        }
+        
+        function renderSelectedPatientBadge() {
+            const badge = document.getElementById('selectedPatientBadge');
+            if (STATE.selectedPatient && STATE.patientData && STATE.patientData.patient) {
+                const patientName = STATE.patientData.patient.patient_name || 'Unknown Patient';
+                badge.innerHTML = `
+                    <div class="selected-patient-badge">
+                        ✓ ${patientName} (${STATE.selectedPatient})
+                    </div>
+                `;
+            } else {
+                badge.innerHTML = '';
+            }
+        }
+        
+        function renderPatientInfo() {
+            const container = document.getElementById('patientInfoContainer');
+            
+            if (!STATE.patientData || !STATE.patientData.patient) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <h3>No Patient Selected</h3>
+                        <p>Please select a patient from the search above.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const data = STATE.patientData;
+            const patient = data.patient;
+            
+            // Safe helper to get value or 'N/A'
+            const safeValue = (val) => val || 'N/A';
+            
+            container.innerHTML = `
+                <!-- Basic Information -->
+                <div class="info-section">
+                    <div class="info-section-header">
+                        <div class="info-section-icon">👤</div>
+                        <h3 class="info-section-title">Patient Information</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Patient ID</div>
+                            <div class="info-value">${safeValue(patient.name)}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Full Name</div>
+                            <div class="info-value">${safeValue(patient.patient_name)}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Age</div>
+                            <div class="info-value">${safeValue(patient.age)}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Gender</div>
+                            <div class="info-value">${safeValue(patient.gender)}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Blood Group</div>
+                            <div class="info-value">${safeValue(patient.blood_group)}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Contact</div>
+                            <div class="info-value">${safeValue(patient.mobile)}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alerts & Allergies -->
+                ${(data.alerts && Array.isArray(data.alerts) && data.alerts.length > 0) ? `
+                <div class="info-section">
+                    <div class="info-section-header">
+                        <div class="info-section-icon">⚠️</div>
+                        <h3 class="info-section-title">Alerts & Allergies</h3>
+                    </div>
+                    ${data.alerts.map(alert => `
+                        <div class="alert-item ${alert.severity === 'high' ? 'error' : 'warning'}">
+                            <span class="alert-icon">${alert.severity === 'high' ? '🚨' : '⚠️'}</span>
+                            <span>${safeValue(alert.message)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+                
+                <!-- Medical History -->
+                ${(patient.medical_history || patient.surgical_history || patient.medication) ? `
+                <div class="info-section">
+                    <div class="info-section-header">
+                        <div class="info-section-icon">📜</div>
+                        <h3 class="info-section-title">Medical History</h3>
+                    </div>
+                    ${patient.medical_history ? `
+                        <div style="margin-bottom: var(--space-md);">
+                            <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--space-xs);">Medical History</div>
+                            <div style="background: var(--tertiary-bg); padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.9rem;">
+                                ${patient.medical_history}
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${patient.surgical_history ? `
+                        <div style="margin-bottom: var(--space-md);">
+                            <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--space-xs);">Surgical History</div>
+                            <div style="background: var(--tertiary-bg); padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.9rem;">
+                                ${patient.surgical_history}
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${patient.medication ? `
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--space-xs);">Current Medication</div>
+                            <div style="background: var(--tertiary-bg); padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.9rem;">
+                                ${patient.medication}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                <!-- Recent Encounters -->
+                <div class="info-section">
+                    <div class="info-section-header">
+                        <div class="info-section-icon">📋</div>
+                        <h3 class="info-section-title">Recent Encounters</h3>
+                    </div>
+                    ${(data.recent_encounters && Array.isArray(data.recent_encounters) && data.recent_encounters.length > 0) ? `
+                        <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+                            ${data.recent_encounters.map(enc => `
+                                <div style="background: var(--tertiary-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-md);">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-sm);">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.25rem;">
+                                                ${enc.title ? safeValue(enc.title) : 'Encounter'} - ${safeValue(enc.encounter_date)}
+                                                ${enc.encounter_time ? ` at ${enc.encounter_time}` : ''}
+                                            </div>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                            ${safeValue(enc.practitioner_name || enc.practitioner)}
+                                                ${enc.medical_department ? ` • ${enc.medical_department}` : ''}
+                                        </div>
+                                    </div>
+                                        ${enc.status ? `<span class="badge ${enc.status === 'Open' ? 'warning' : enc.status === 'Completed' ? 'success' : ''}" style="font-size: 0.7rem;">${enc.status}</span>` : ''}
+                                    </div>
+                                    
+                                    ${enc.symptoms && Array.isArray(enc.symptoms) && enc.symptoms.length > 0 ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Symptoms</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${enc.symptoms.map(s => {
+                                                    // Handle different data formats
+                                                    if (s.text) return s.text;
+                                                    if (s.complaint) return s.complaint;
+                                                    if (s.symptom) return s.symptom;
+                                                    if (s.complaint_code) return s.complaint_code;
+                                                    if (s.symptom_code) return s.symptom_code;
+                                                    if (s.name) return s.name;
+                                                    if (s.description) return s.description;
+                                                    // If it's an object, try to get any string value
+                                                    const values = Object.values(s).filter(v => v && typeof v === 'string');
+                                                    return values.length > 0 ? values[0] : null;
+                                                }).filter(Boolean).join(', ') || 'N/A'}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${enc.diagnosis && Array.isArray(enc.diagnosis) && enc.diagnosis.length > 0 ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Diagnosis</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${enc.diagnosis.map(d => {
+                                                    // Handle different data formats
+                                                    if (d.text) return d.text;
+                                                    if (d.diagnosis) return d.diagnosis;
+                                                    if (d.diagnosis_code) return d.diagnosis_code;
+                                                    if (d.code) return d.code;
+                                                    if (d.name) return d.name;
+                                                    if (d.description) return d.description;
+                                                    if (d.condition) return d.condition;
+                                                    // If it's an object, try to get any string value
+                                                    const values = Object.values(d).filter(v => v && typeof v === 'string');
+                                                    return values.length > 0 ? values[0] : null;
+                                                }).filter(Boolean).join(', ') || 'N/A'}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${enc.medications && Array.isArray(enc.medications) && enc.medications.length > 0 ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Medications Prescribed</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${enc.medications.map(m => {
+                                                    const parts = [];
+                                                    // Try multiple field names for drug name
+                                                    const drugName = m.drug_name || m.drug_code || m.medication || m.medicine || m.item_code || '';
+                                                    if (drugName) parts.push(drugName);
+                                                    // Try multiple field names for dosage
+                                                    const dosage = m.dosage || m.dosage_form || '';
+                                                    if (dosage) parts.push(`(${dosage})`);
+                                                    // Try multiple field names for period/duration
+                                                    const period = m.period || m.duration || m.interval || '';
+                                                    if (period) parts.push(`for ${period}`);
+                                                    return parts.length > 0 ? parts.join(' ') : (drugName || 'N/A');
+                                                }).filter(Boolean).join('; ') || 'N/A'}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${enc.lab_tests_ordered && Array.isArray(enc.lab_tests_ordered) && enc.lab_tests_ordered.length > 0 ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Lab Tests Ordered</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${enc.lab_tests_ordered.map(t => {
+                                                    return t.lab_test_name || t.lab_test_code || t.test_name || t.test_code || t.template || t.template_name || 'N/A';
+                                                }).filter(v => v !== 'N/A').join(', ') || 'N/A'}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${enc.procedures_ordered && Array.isArray(enc.procedures_ordered) && enc.procedures_ordered.length > 0 ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Procedures Ordered</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${enc.procedures_ordered.map(p => {
+                                                    return p.procedure_name || p.procedure || p.procedure_code || p.template || p.template_name || 'N/A';
+                                                }).filter(v => v !== 'N/A').join(', ') || 'N/A'}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${enc.encounter_comment ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Notes</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary); font-style: italic;">
+                                                ${enc.encounter_comment}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<div class="no-data">No recent encounters</div>'}
+                </div>
+                
+                <!-- Upcoming Appointments -->
+                <div class="info-section">
+                    <div class="info-section-header">
+                        <div class="info-section-icon">📅</div>
+                        <h3 class="info-section-title">Upcoming Appointments</h3>
+                    </div>
+                    ${(data.upcoming_appointments && Array.isArray(data.upcoming_appointments) && data.upcoming_appointments.length > 0) ? `
+                        <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+                            ${data.upcoming_appointments.map(apt => `
+                                <div style="background: var(--tertiary-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-md);">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-sm);">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.25rem;">
+                                                ${apt.title ? safeValue(apt.title) : 'Appointment'} - ${safeValue(apt.appointment_date)}
+                                                ${apt.appointment_time ? ` at ${apt.appointment_time}` : ''}
+                                            </div>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                                ${safeValue(apt.practitioner_name || apt.practitioner)}
+                                                ${apt.department ? ` • ${apt.department}` : ''}
+                                                ${apt.appointment_type ? ` • ${apt.appointment_type}` : ''}
+                                        </div>
+                                    </div>
+                                        ${apt.status ? `<span class="badge ${apt.status === 'Open' ? 'warning' : apt.status === 'Confirmed' ? 'success' : apt.status === 'Scheduled' ? 'success' : ''}" style="font-size: 0.7rem;">${apt.status}</span>` : ''}
+                                    </div>
+                                    
+                                    ${apt.service_unit ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Service Unit</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${apt.service_unit}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${apt.duration ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Duration</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${apt.duration} minutes
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${apt.mode_of_payment ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Payment Mode</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${apt.mode_of_payment}
+                                                ${apt.paid_amount ? ` (${apt.paid_amount})` : ''}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${apt.referring_practitioner ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Referred By</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                ${apt.referring_practitioner}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${apt.google_meet_link ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Video Conference</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary);">
+                                                <a href="${apt.google_meet_link}" target="_blank" style="color: var(--accent-primary); text-decoration: none;">Join Meeting</a>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${apt.notes ? `
+                                        <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--border-subtle);">
+                                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Notes</div>
+                                            <div style="font-size: 0.85rem; color: var(--text-primary); font-style: italic;">
+                                                ${apt.notes}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<div class="no-data">No upcoming appointments</div>'}
+                </div>
+                
+                <!-- Pending Lab Tests -->
+                <div class="info-section">
+                    <div class="info-section-header">
+                        <div class="info-section-icon">🧪</div>
+                        <h3 class="info-section-title">Pending Lab Tests</h3>
+                    </div>
+                    ${(data.pending_lab_tests && Array.isArray(data.pending_lab_tests) && data.pending_lab_tests.length > 0) ? `
+                        <ul class="info-list">
+                            ${data.pending_lab_tests.map(lab => `
+                                <li class="info-list-item">
+                                    <div>
+                                        <div style="font-weight: 600;">${safeValue(lab.lab_test_name || lab.name)}</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                            ${lab.result_date ? `Result: ${lab.result_date}` : `Created: ${safeValue(lab.creation)}`}
+                                        </div>
+                                    </div>
+                                    <span class="badge warning">${safeValue(lab.status)}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : '<div class="no-data">No pending lab tests</div>'}
+                </div>
+            `;
+        }
+        
+        // =================================================================
+        // AI ASSISTANT FUNCTIONS
+        // =================================================================
+        function updateAIStatus(status, text) {
+            const statusBadge = document.getElementById('statusBadge');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            // Update status badge text
+            if (statusBadge) {
+                const statusText = text || (status === 'loading' || status === 'thinking' ? 'Thinking' : status === 'error' ? 'Error' : 'Ready');
+                statusBadge.textContent = statusText;
+                
+                // Update badge class
+                statusBadge.className = 'status-badge';
+                if (status === 'loading' || status === 'thinking') {
+                    statusBadge.classList.add('thinking');
+                } else if (status === 'ready') {
+                    statusBadge.classList.add('ready');
+                } else if (status === 'error') {
+                    statusBadge.classList.add('error');
+                }
+            }
+            
+            // Show/hide loading overlay and hide/show chat messages
+            if (loadingOverlay) {
+                if (status === 'loading' || status === 'thinking') {
+                    loadingOverlay.style.display = 'flex';
+                    // Force reflow to ensure display
+                    loadingOverlay.offsetHeight;
+                    // Hide chat messages when thinking
+                    if (messagesContainer) {
+                        messagesContainer.style.display = 'none';
+                    }
+                } else {
+                    loadingOverlay.style.display = 'none';
+                    // Show chat messages when ready
+                    if (messagesContainer) {
+                        messagesContainer.style.display = 'block';
+                        // Scroll to bottom when messages are displayed again
+                        setTimeout(() => {
+                            scrollAIChat();
+                        }, 100);
+                    }
+                }
+            }
+        }
+        
+        async function loadInitialAIContext() {
+            // Validate patient data exists
+            if (!STATE.patientData || !STATE.patientData.patient) {
+                return;
+            }
+            
+            // Ensure sessionId exists (should be set when patient is selected)
+            if (!STATE.sessionId) {
+                STATE.sessionId = `patient_${STATE.selectedPatient}_${Date.now()}`;
+            }
+            
+            // Update AI status
+            updateAIStatus('loading', 'Analyzing patient data...');
+            
+            // Hide welcome message
+            document.getElementById('welcomeMessage').classList.add('hidden');
+            
+            // Show loading message
+            const container = document.getElementById('messagesContainer');
+            const patientName = STATE.patientData.patient.patient_name || 'the selected patient';
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'initialLoading';
+            loadingDiv.className = 'message bot';
+            loadingDiv.innerHTML = `
+                <div class="message-avatar bot">🩺</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <strong>AI Assistant</strong>
+                        <span>${getCurrentTime()}</span>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-text">
+                            Loading medical profile for <strong>${patientName}</strong>...
+                        </div>
+                        <div class="typing-indicator" style="margin-top: var(--space-md);">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(loadingDiv);
+            scrollAIChat();
+            
+            // Call AI to analyze patient on initial load
+            try {
+                const response = await frappeAPI({
+                    query_type: 'ai_query',
+                    parameters: {
+                        patient_id: STATE.selectedPatient,
+                        user_query: "Initial patient context load",
+                        patient_context: STATE.patientData,
+                        is_initial_load: true,
+                        session_id: STATE.sessionId
+                    }
+                });
+                
+                // Remove loading message
+                const loadingEl = document.getElementById('initialLoading');
+                if (loadingEl) {
+                    loadingEl.remove();
+                }
+                
+                // Add AI's initial analysis
+                addAIResponse(response);
+                
+                // Mark AI as ready
+                updateAIStatus('ready', 'Context loaded - Ready');
+                
+            } catch (error) {
+                // Remove loading message
+                const loadingEl = document.getElementById('initialLoading');
+                if (loadingEl) {
+                    loadingEl.remove();
+                }
+                
+                // Show fallback message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                messageDiv.innerHTML = `
+                    <div class="message-avatar bot">🩺</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <strong>AI Assistant</strong>
+                            <span>${getCurrentTime()}</span>
+                        </div>
+                        <div class="message-bubble">
+                            <div class="message-text">
+                                I've loaded the complete medical profile for <strong>${patientName}</strong>. 
+                                I have access to their medical history, allergies, recent encounters, medications, 
+                                and lab results. How can I assist you with their diagnosis today?
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(messageDiv);
+                scrollAIChat();
+                
+                // Mark as ready even in fallback mode
+                updateAIStatus('ready', 'Ready');
+                
+                showToast('AI context loaded (fallback mode)', 'warning');
+            }
+        }
+        
+        async function sendQuery() {
+            const input = document.getElementById('queryInput');
+            const query = input.value.trim();
+            
+            // Allow sending even if only file is selected
+            if ((!query && !STATE.selectedFile) || STATE.isProcessing) return;
+            
+            if (!STATE.selectedPatient) {
+                showToast('Please select a patient first', 'warning');
+                return;
+            }
+            
+            // Ensure sessionId exists (should be set when patient is selected)
+            if (!STATE.sessionId) {
+                STATE.sessionId = `patient_${STATE.selectedPatient}_${Date.now()}`;
+            }
+            
+            // Get file data before clearing
+            const fileData = STATE.selectedFileData;
+            
+            // Add user message (include file info if present)
+            let userMessage = query || 'Analyze this file';
+            
+            // Clear input and file
+            input.value = '';
+            input.style.height = 'auto';
+            removeFile();
+            
+            // Upload file to Frappe if present
+            let uploadedFileUrl = null;
+            if (fileData) {
+                try {
+                    uploadedFileUrl = await uploadFileToFrappe(fileData);
+                    addMessage('user', userMessage, { ...fileData, url: uploadedFileUrl });
+                } catch (error) {
+                    showToast('Failed to upload file: ' + error.message, 'error');
+                    addMessage('user', userMessage, fileData);
+                }
+            } else {
+                addMessage('user', userMessage);
+            }
+            
+            // Hide welcome screen
+            document.getElementById('welcomeMessage').classList.add('hidden');
+            
+            // Update status (overlay GIF will show, no typing indicator needed)
+            STATE.isProcessing = true;
+            updateAIStatus('loading', 'Thinking...');
+            
+            try {
+                // Send to AI endpoint with full patient context and file if present
+                const payload = {
+                    query_type: 'ai_query',
+                    parameters: {
+                        patient_id: STATE.selectedPatient,
+                        user_query: query || 'Please analyze the uploaded file',
+                        patient_context: STATE.patientData,
+                        is_initial_load: false,
+                        session_id: STATE.sessionId,
+                        file_url: uploadedFileUrl,  // Use uploaded file URL instead of base64
+                        file_name: fileData?.name || null,
+                        file_type: fileData?.mimeType || null
+                    }
+                };
+                
+                // Make API call
+                const response = await frappeAPI(payload);
+                
+                // Add AI response
+                addAIResponse(response);
+                
+                // Update status
+                updateAIStatus('ready', 'Ready');
+                
+            } catch (error) {
+                updateAIStatus('error', 'Error');
+                showToast(`Error: ${error.message}`, 'error');
+                addMessage('bot', `Sorry, I encountered an error: ${error.message}`);
+                
+                // Reset status after 3 seconds
+                setTimeout(() => {
+                    updateAIStatus('ready', 'Ready');
+                }, 3000);
+            } finally {
+                STATE.isProcessing = false;
+            }
+        }
+        
+        function quickAction(action) {
+            if (!STATE.selectedPatient) {
+                showToast('Please select a patient first', 'warning');
+                return;
+            }
+            
+            const queries = {
+                'analyze': 'Analyze the complete medical history and provide key insights',
+                'medications': 'Review all active medications and check for potential interactions',
+                'labs': 'Summarize recent lab results and highlight any abnormal values',
+                'risk': 'Assess current risk factors based on medical history and conditions'
+            };
+            
+            document.getElementById('queryInput').value = queries[action];
+            sendQuery();
+        }
+        
+        // Upload file to Frappe
+        async function uploadFileToFrappe(fileData) {
+            const formData = new FormData();
+            
+            // Convert base64 back to blob for upload
+            const byteCharacters = atob(fileData.data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: fileData.mimeType });
+            
+            formData.append('file', blob, fileData.name);
+            formData.append('is_private', '0');
+            formData.append('doctype', 'Patient');
+            formData.append('docname', STATE.selectedPatient || 'ai_bot_upload');
+
+            const csrfToken = getCSRFToken();
+            const headers = {
+                'Authorization': `token ${CONFIG.API_KEY}:${CONFIG.API_SECRET}`
+            };
+            if (csrfToken) {
+                headers['X-Frappe-CSRF-Token'] = csrfToken;
+            }
+
+            const response = await fetch(`${CONFIG.FRAPPE_BASE_URL}/api/method/upload_file`, {
+                method: 'POST',
+                headers: headers,
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (data.message && data.message.file_url) {
+                // Return full URL
+                let fileUrl = data.message.file_url;
+                if (fileUrl.startsWith('/')) {
+                    fileUrl = CONFIG.FRAPPE_BASE_URL + fileUrl;
+                }
+                return fileUrl;
+            } else {
+                throw new Error('Upload failed: ' + (data.exc || 'Unknown error'));
+            }
+        }
+        
+        function addMessage(type, content, fileData = null) {
+            const container = document.getElementById('messagesContainer');
+            const timestamp = getCurrentTime();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const avatar = type === 'bot' ? '🩺' : '👨‍⚕️';
+            const name = type === 'bot' ? 'AI Assistant' : 'You';
+            
+            let filePreview = '';
+            if (fileData) {
+                const fileUrl = fileData.url || (fileData.data ? `data:${fileData.mimeType};base64,${fileData.data}` : null);
+                if (fileData.mimeType && fileData.mimeType.startsWith('image/') && fileUrl) {
+                    filePreview = `<div style="margin-bottom: var(--space-sm);">
+                        <img src="${fileUrl}" 
+                             alt="${fileData.name || 'Uploaded image'}" 
+                             style="max-width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);" />
+                    </div>`;
+                } else if (fileData) {
+                    filePreview = `<div style="margin-bottom: var(--space-sm); padding: var(--space-sm); background: var(--tertiary-bg); border-radius: var(--radius-md); font-size: 0.85rem;">
+                        📄 ${fileData.name || 'File'} ${fileData.size ? `(${(fileData.size / 1024).toFixed(1)} KB)` : ''}
+                    </div>`;
+                }
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar ${type}">${avatar}</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <strong>${name}</strong>
+                        <span>${timestamp}</span>
+                    </div>
+                    <div class="message-bubble">
+                        ${filePreview}
+                        <div class="message-text">${content}</div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            scrollAIChat();
+            
+            STATE.messages.push({ type, content, timestamp, fileData });
+        }
+        
+        function addAIResponse(response) {
+            const container = document.getElementById('messagesContainer');
+            const timestamp = getCurrentTime();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            
+            let contentHTML = '';
+            
+            // Handle AI response
+            if (response.status === 'success' && response.data && response.data.ai_response) {
+                // Render markdown properly
+                const aiResponse = renderMarkdown(response.data.ai_response);
+                
+                contentHTML = `
+                    <div class="message-text">
+                        ${aiResponse}
+                    </div>
+                    ${response.data.model_used ? `
+                        <div style="margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-tertiary);">
+                            Powered by ${response.data.model_used}
+                        </div>
+                    ` : ''}
+                `;
+            } else if (response.status === 'error') {
+                // Handle error
+                contentHTML = `
+                    <div class="message-text">
+                        <span class="badge error">Error</span><br><br>
+                        ${response.message || 'An error occurred. Please try again.'}
+                        ${response.fallback_message ? `<br><br>${response.fallback_message}` : ''}
+                    </div>
+                `;
+            } else {
+                // Fallback for unexpected response
+                contentHTML = `<div class="message-text">I received your question but couldn't process it. Please try again.</div>`;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar bot">🩺</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <strong>AI Assistant</strong>
+                        <span>${timestamp}</span>
+                    </div>
+                    <div class="message-bubble">
+                        ${contentHTML}
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            scrollAIChat();
+        }
+        
+        // Markdown renderer using marked.js library
+        function renderMarkdown(text) {
+            if (!text) return '';
+            
+            // Configure marked options
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({
+                    breaks: true,  // Convert \n to <br>
+                    gfm: true,     // GitHub Flavored Markdown
+                    headerIds: false,
+                    mangle: false
+                });
+                
+                try {
+                    return marked.parse(text);
+                } catch (error) {
+                    console.error('Markdown parsing error:', error);
+                    // Fallback to basic HTML escaping
+                    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+                }
+            } else {
+                // Fallback if marked.js is not loaded
+                console.warn('marked.js not loaded, using basic formatting');
+                return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+            }
+        }
+        
+        // File handling functions
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size (max 20MB)
+            if (file.size > 20 * 1024 * 1024) {
+                showToast('File size must be less than 20MB', 'error');
+                return;
+            }
+            
+            STATE.selectedFile = file;
+            
+            // Show file preview
+            const preview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            fileName.textContent = file.name;
+            preview.style.display = 'block';
+            
+            // Read file as base64
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                STATE.selectedFileData = {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: e.target.result.split(',')[1], // Remove data:image/...;base64, prefix
+                    mimeType: file.type
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function removeFile() {
+            STATE.selectedFile = null;
+            STATE.selectedFileData = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreview').style.display = 'none';
+        }
+        
+        function renderData(data, queryType) {
+            return `
+                <div class="data-display">
+                    <div class="data-header">
+                        <h4>Response Data</h4>
+                        <div class="data-actions">
+                            <button onclick="copyData(this)">📋 Copy</button>
+                            <button onclick="exportData(this)">💾 Export</button>
+                        </div>
+                    </div>
+                    <div class="json-view">${JSON.stringify(data, null, 2)}</div>
+                </div>
+            `;
+        }
+        
+        function showTypingIndicator() {
+            const container = document.getElementById('messagesContainer');
+            const indicator = document.createElement('div');
+            indicator.id = 'typingIndicator';
+            indicator.className = 'message bot';
+            indicator.innerHTML = `
+                <div class="message-avatar bot">🩺</div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="typing-indicator">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(indicator);
+            scrollAIChat();
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        function clearAIChat() {
+            document.getElementById('messagesContainer').innerHTML = '';
+            document.getElementById('welcomeMessage').classList.remove('hidden');
+            STATE.messages = [];
+        }
+        
+        function scrollAIChat() {
+            const chatArea = document.getElementById('aiChatArea');
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        // =================================================================
+        // CSRF TOKEN MANAGEMENT
+        // =================================================================
+        function getCSRFToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrf_token') {
+                    return decodeURIComponent(value);
+                }
+            }
+            
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag) {
+                return metaTag.getAttribute('content');
+            }
+            
+            if (typeof frappe !== 'undefined' && frappe.csrf_token) {
+                return frappe.csrf_token;
+            }
+            
+            return null;
+        }
+        
+        async function fetchCSRFToken() {
+            try {
+                const response = await fetch(`${CONFIG.FRAPPE_BASE_URL}/api/method/frappe.auth.get_logged_user`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const token = getCSRFToken();
+                    if (token) {
+                        return token;
+                    }
+                }
+                
+                const altResponse = await fetch(`${CONFIG.FRAPPE_BASE_URL}/`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                if (altResponse.ok) {
+                    const token = getCSRFToken();
+                    if (token) {
+                        return token;
+                    }
+                }
+                
+                return null;
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        // =================================================================
+        // API CALLS
+        // =================================================================
+        async function frappeAPI(payload) {
+            const url = `${CONFIG.FRAPPE_BASE_URL}${CONFIG.API_METHOD}`;
+            
+            const headers = {
+                'Authorization': `token ${CONFIG.API_KEY}:${CONFIG.API_SECRET}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            
+            const csrfToken = getCSRFToken();
+            if (csrfToken) {
+                headers['X-Frappe-CSRF-Token'] = csrfToken;
+            }
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(payload),
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+                
+                try {
+                    const errorData = JSON.parse(errorText);
+                    if (errorData.exc_type === 'CSRFTokenError') {
+                        errorMessage = 'CSRF Token Error: Please refresh the page and try again.';
+                    } else if (errorData._server_messages) {
+                        const messages = JSON.parse(errorData._server_messages);
+                        if (messages.length > 0) {
+                            const msg = JSON.parse(messages[0]);
+                            errorMessage = msg.message || errorMessage;
+                        }
+                    }
+                } catch (e) {
+                    // Use default error message
+                }
+                
+                throw new Error(errorMessage);
+            }
+            
+            const data = await response.json();
+            // ERPNext wraps Server Script responses in "message" key
+            // Handle both wrapped and direct response formats
+            return data.message || data;
+        }
+        
+        // =================================================================
+        // QUERY PROCESSING HELPERS
+        // =================================================================
+        function determineQueryType(query) {
+            const lowerQuery = query.toLowerCase();
+            
+            if (lowerQuery.includes('summary') || lowerQuery.includes('overview')) {
+                return 'get_patient_summary';
+            } else if (lowerQuery.includes('history') || lowerQuery.includes('analyze')) {
+                return 'analyze_patient_history';
+            } else if (lowerQuery.includes('medication') || lowerQuery.includes('drug') || lowerQuery.includes('prescription')) {
+                return 'get_active_prescriptions';
+            } else if (lowerQuery.includes('lab') || lowerQuery.includes('test')) {
+                return 'get_lab_tests';
+            } else if (lowerQuery.includes('vital') || lowerQuery.includes('blood pressure')) {
+                return 'get_vital_signs_history';
+            } else if (lowerQuery.includes('appointment')) {
+                return 'get_upcoming_appointments';
+            } else if (lowerQuery.includes('encounter') || lowerQuery.includes('visit')) {
+                return 'get_patient_encounters';
+            } else if (lowerQuery.includes('risk') || lowerQuery.includes('assess')) {
+                return 'analyze_patient_history';
+            } else {
+                return 'get_patient_summary';
+            }
+        }
+        
+        function extractParameters(query) {
+            const params = {};
+            
+            // Extract dates
+            const dateMatch = query.match(/(\d{4}-\d{2}-\d{2})/);
+            if (dateMatch) {
+                params.date = dateMatch[1];
+            }
+            
+            // Extract time periods
+            if (query.toLowerCase().includes('last month')) {
+                params.date_range = 'last_month';
+            } else if (query.toLowerCase().includes('last 3 months')) {
+                params.date_range = 'last_3_months';
+            } else if (query.toLowerCase().includes('last 6 months')) {
+                params.date_range = 'last_6_months';
+            }
+            
+            return params;
+        }
+        
+        // =================================================================
+        // UTILITY FUNCTIONS
+        // =================================================================
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        
+        async function refreshPatientList() {
+            try {
+                // Clear search input
+                document.getElementById('patientSearch').value = '';
+                
+                // Load fresh patient list
+                await loadPatientList();
+                showToast('Patient list refreshed', 'success');
+            } catch (error) {
+                showToast('Failed to refresh patient list', 'error');
+            }
+        }
+        
+        function exportPatientData() {
+            if (!STATE.selectedPatient) {
+                showToast('Please select a patient first', 'warning');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(STATE.patientData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `patient-${STATE.selectedPatient}-${Date.now()}.json`;
+            link.click();
+            showToast('Patient data exported', 'success');
+        }
+        
+        function copyData(button) {
+            const jsonView = button.closest('.data-display').querySelector('.json-view');
+            navigator.clipboard.writeText(jsonView.textContent);
+            showToast('Copied to clipboard', 'success');
+        }
+        
+        function exportData(button) {
+            const jsonView = button.closest('.data-display').querySelector('.json-view');
+            const dataBlob = new Blob([jsonView.textContent], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `data-export-${Date.now()}.json`;
+            link.click();
+            showToast('Data exported', 'success');
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
